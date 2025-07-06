@@ -8,15 +8,15 @@ import lombok.Data;
 
 @Data
 public class LoginRequest {
-    @NotBlank(message = "Email is mandatory")
-    @Email(message = "Email should be valid")
+    @NotBlank(message = "{email.required}")
+    @Email(message = "{email.invalid}")
     private String email;
 
-    @NotBlank(message = "Password is mandatory")
-    @Size(min = 8, message = "Password must be at least 8 characters long")
+    @NotBlank(message = "{password.required}")
+    @Size(min = 8, message = "{password.size}")
     @Pattern(
         regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[#$@!%&*?])[A-Za-z\\d#$@!%&*?]{8,}$",
-        message = "Password must contain at least one lowercase letter, one uppercase letter, one digit and one special character"
+        message = "{password.pattern}"
     )
     private String password;
 }

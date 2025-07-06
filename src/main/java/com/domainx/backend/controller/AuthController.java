@@ -1,8 +1,10 @@
 package com.domainx.backend.controller;
 
 import java.util.List;
+import java.util.Locale;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -46,9 +48,11 @@ public class AuthController {
     private UserRepository userRepository;
     @Autowired
     private PasswordEncoder encoder;
+    @Autowired
+    private MessageSource messageSource;
     
     @PostMapping("/login")
-    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest loginRequest, Locale locale) {
         try {
             Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword())
@@ -58,16 +62,16 @@ public class AuthController {
             return ResponseEntity.ok(userTokens);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(new ErrorResponse("Invalid username or password"));
+                .body(new ErrorResponse(messageSource.getMessage("invalid_credentials", null, locale)));
         }
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody RegisterRequest registerRequest) {
+    public ResponseEntity<?> register(@RequestBody RegisterRequest registerRequest, Locale locale) {
         if (userRepository.existsByEmail(registerRequest.getEmail())) {
             return ResponseEntity
                 .badRequest()
-                .body(new ErrorResponse("Username is already taken"));
+                .body(new ErrorResponse(messageSource.getMessage("email_already_taken", null, locale)));
         }
         User newUser = new User(
             registerRequest.getName(),
@@ -87,7 +91,7 @@ public class AuthController {
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<?> refreshToken(@RequestBody RefreshRequest refreshRequest) {
+    public ResponseEntity<?> refreshToken(@RequestBody RefreshRequest refreshRequest, Locale locale) {
         try {
             String refreshToken = refreshRequest.getRefreshToken();
             String email = jwtService.extractSubject(refreshToken);
@@ -95,7 +99,7 @@ public class AuthController {
             UserDetails userDetails = userDetailsService.loadUserByEmail(email);
 
             if (!jwtService.isTokenValid(refreshToken, userDetails)) {
-                return ResponseEntity.badRequest().body(new ErrorResponse("Token is not valid"));
+                return ResponseEntity.badRequest().body(new ErrorResponse(messageSource.getMessage("invalid_token", null, locale)));
             }
 
             String newAccessToken = jwtService.generateAccessToken(userDetails);
@@ -103,7 +107,7 @@ public class AuthController {
             return ResponseEntity.ok(new TokenResponse(newAccessToken, refreshToken));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(new ErrorResponse("Invalid refresh token"));
+                .body(new ErrorResponse(messageSource.getMessage("invalid_token", null, locale)));
         }
     }
 }
