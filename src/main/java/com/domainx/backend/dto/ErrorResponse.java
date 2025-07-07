@@ -17,7 +17,8 @@ public class ErrorResponse {
     }
 
     public ErrorResponse(Map<String, String> errors) {
-        this.message = "Validation Error";
+        Map.Entry<String,String> entry = errors.entrySet().iterator().next();
+        this.message = errors.get(entry.getValue());
         this.errors = errors;
     }
 }

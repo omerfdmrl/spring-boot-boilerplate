@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -22,12 +23,14 @@ public class TokenService {
     private TokenRepository tokenRepository;
     @Autowired
     private UserRepository userRepository;
+    @Value("${app.security.jwt.refresh_expiration_days}")
+    private long REFRESH_EXPIRATION_DAYS;
 
     public TokenResponse generateJwtTokens(UserDetails userDetails) {
         String accessToken = jwtService.generateAccessToken(userDetails);
         String refreshToken = jwtService.generateRefreshToken(userDetails);
 
-        LocalDateTime expiresAt = LocalDateTime.now().plus(7, ChronoUnit.DAYS);
+        LocalDateTime expiresAt = LocalDateTime.now().plus(REFRESH_EXPIRATION_DAYS, ChronoUnit.DAYS);
         User user = userRepository.findByEmail(userDetails.getUsername())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
