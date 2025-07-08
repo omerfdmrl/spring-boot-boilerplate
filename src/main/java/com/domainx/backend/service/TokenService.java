@@ -39,4 +39,17 @@ public class TokenService {
 
         return new TokenResponse(accessToken, refreshToken);
     }
+
+    public String generatePasswordResetToken(UserDetails userDetails) {
+        String resetPasswordToken = jwtService.generateResetPasswordToken(userDetails);
+
+        LocalDateTime expiresAt = LocalDateTime.now().plus(REFRESH_EXPIRATION_DAYS, ChronoUnit.DAYS);
+        User user = userRepository.findByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Token token = new Token(null, resetPasswordToken, "RESET_PASSWORD", user, expiresAt);
+        tokenRepository.save(token);
+
+        return resetPasswordToken;
+    }
 }

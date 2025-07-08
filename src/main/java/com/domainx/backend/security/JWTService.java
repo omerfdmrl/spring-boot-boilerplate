@@ -30,6 +30,11 @@ public class JWTService {
         return generateToken(userDetails.getUsername(), expirationMs, "REFRESH");
     }
 
+    public String generateResetPasswordToken(UserDetails userDetails) {
+        long expirationMs = 1000L * 60 * ACCESS_EXPIRATION_MINUTES;
+        return generateToken(userDetails.getUsername(), expirationMs, "RESET_PASSWORD");
+    }
+
     private String generateToken(String subject, long expirationMs, String tokenType) {
         return Jwts.builder()
                 .setSubject(subject)
@@ -54,7 +59,7 @@ public class JWTService {
         return subject.equals(userDetails.getUsername()) && !isTokenExpired(token) && tokenType.equals(extractTokenType(token));
     }
 
-    private boolean isTokenExpired(String token) {
+    public boolean isTokenExpired(String token) {
         Date expiration = Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()
