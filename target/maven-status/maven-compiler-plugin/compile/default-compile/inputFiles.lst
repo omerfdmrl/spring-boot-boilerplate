@@ -9,6 +9,8 @@
 /home/obuntu/Projects/nyom.dev/backend2/src/main/java/com/domainx/backend/auth/request/RegisterRequest.java
 /home/obuntu/Projects/nyom.dev/backend2/src/main/java/com/domainx/backend/auth/request/ResetPasswordRequest.java
 /home/obuntu/Projects/nyom.dev/backend2/src/main/java/com/domainx/backend/auth/response/TokenResponse.java
+/home/obuntu/Projects/nyom.dev/backend2/src/main/java/com/domainx/backend/auth/response/UserResponse.java
+/home/obuntu/Projects/nyom.dev/backend2/src/main/java/com/domainx/backend/auth/response/UserTokenResponse.java
 /home/obuntu/Projects/nyom.dev/backend2/src/main/java/com/domainx/backend/config/LocaleConfig.java
 /home/obuntu/Projects/nyom.dev/backend2/src/main/java/com/domainx/backend/config/SecurityConfig.java
 /home/obuntu/Projects/nyom.dev/backend2/src/main/java/com/domainx/backend/config/SeederRunner.java
