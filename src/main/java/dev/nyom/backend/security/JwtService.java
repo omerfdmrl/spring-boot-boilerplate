@@ -1,38 +1,38 @@
 package dev.nyom.backend.security;
 
+import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
 import java.util.UUID;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 
 @Service
 public class JwtService {
-    @Value("${app.security.jwt.access_expiration_minutes}")
-    private long ACCESS_EXPIRATION_MINUTES;
-    @Value("${app.security.jwt.refresh_expiration_days}")
-    private long REFRESH_EXPIRATION_DAYS;
+    private final JwtProperties jwtProperties;
+    private final Key key;
 
-    private Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+    public JwtService(JwtProperties jwtProperties) {
+        this.jwtProperties = jwtProperties;
+        this.key = Keys.hmacShaKeyFor(jwtProperties.getSecret().getBytes(StandardCharsets.UTF_8));
+    }
 
     public String generateAccessToken(String subject) {
-        long expirationMs = 1000L * 60 * ACCESS_EXPIRATION_MINUTES;
+        long expirationMs = 1000L * 60 * this.jwtProperties.getAccessExpirationMinutes();
         return generateToken(subject, expirationMs, "ACCESS");
     }
 
     public String generateRefreshToken(String subject) {
-        long expirationMs = 1000L * 60 * 60 * 24 * REFRESH_EXPIRATION_DAYS;
+        long expirationMs = 1000L * 60 * 60 * 24 * this.jwtProperties.getRefreshExpirationDays();
         return generateToken(subject, expirationMs, "REFRESH");
     }
 
     public String generateResetPasswordToken(String subject) {
-        long expirationMs = 1000L * 60 * ACCESS_EXPIRATION_MINUTES;
+        long expirationMs = 1000L * 60 * this.jwtProperties.getForgotPasswordExpirationMinutes();
         return generateToken(subject, expirationMs, "RESET_PASSWORD");
     }
 

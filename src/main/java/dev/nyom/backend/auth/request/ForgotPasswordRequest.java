@@ -10,6 +10,6 @@ import lombok.Data;
 public class ForgotPasswordRequest {
     @Email
     @NotBlank()
-    @Schema(description = "Email address of the user", example = "john@example.com")
+    @Schema(description = "Email address of the user", example = "john@example.com", required = true)
     private String email;
 }

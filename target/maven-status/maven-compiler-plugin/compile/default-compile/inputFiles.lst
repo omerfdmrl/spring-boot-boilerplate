@@ -22,6 +22,7 @@
 /home/obuntu/Projects/nyom.dev/backend2/src/main/java/dev/nyom/backend/notification/MailService.java
 /home/obuntu/Projects/nyom.dev/backend2/src/main/java/dev/nyom/backend/security/JwtAuthFilter.java
 /home/obuntu/Projects/nyom.dev/backend2/src/main/java/dev/nyom/backend/security/JwtEntryPoint.java
+/home/obuntu/Projects/nyom.dev/backend2/src/main/java/dev/nyom/backend/security/JwtProperties.java
 /home/obuntu/Projects/nyom.dev/backend2/src/main/java/dev/nyom/backend/security/JwtService.java
 /home/obuntu/Projects/nyom.dev/backend2/src/main/java/dev/nyom/backend/user/UserController.java
 /home/obuntu/Projects/nyom.dev/backend2/src/main/java/dev/nyom/backend/user/dto/UserDto.java

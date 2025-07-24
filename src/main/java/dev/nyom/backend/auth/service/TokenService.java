@@ -3,34 +3,31 @@ package dev.nyom.backend.auth.service;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import dev.nyom.backend.auth.dto.TokenDto;
 import dev.nyom.backend.auth.mapper.TokenMapper;
 import dev.nyom.backend.auth.model.Token;
 import dev.nyom.backend.auth.repository.TokenRepository;
+import dev.nyom.backend.security.JwtProperties;
 import dev.nyom.backend.security.JwtService;
 import dev.nyom.backend.user.model.User;
 import dev.nyom.backend.user.repository.UserRepository;
+import lombok.AllArgsConstructor;
 
 @Service
+@AllArgsConstructor
 public class TokenService {
-    @Autowired
-    private JwtService jwtService;
-    @Autowired
-    private TokenRepository tokenRepository;
-    @Autowired
-    private UserRepository userRepository;
-    @Value("${app.security.jwt.refresh_expiration_days}")
-    private long REFRESH_EXPIRATION_DAYS;
+    private final JwtService jwtService;
+    private final TokenRepository tokenRepository;
+    private final UserRepository userRepository;
+    private final JwtProperties jwtProperties;
 
     public TokenDto generateJwtTokens(String subject) {
         String accessToken = jwtService.generateAccessToken(subject);
         String refreshToken = jwtService.generateRefreshToken(subject);
 
-        LocalDateTime expiresAt = LocalDateTime.now().plus(REFRESH_EXPIRATION_DAYS, ChronoUnit.DAYS);
+        LocalDateTime expiresAt = LocalDateTime.now().plus(this.jwtProperties.getRefreshExpirationDays(), ChronoUnit.DAYS);
         User user = userRepository.findByEmail(subject)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -43,7 +40,7 @@ public class TokenService {
     public String generatePasswordResetToken(String subject) {
         String resetPasswordToken = jwtService.generateResetPasswordToken(subject);
 
-        LocalDateTime expiresAt = LocalDateTime.now().plus(REFRESH_EXPIRATION_DAYS, ChronoUnit.DAYS);
+        LocalDateTime expiresAt = LocalDateTime.now().plus(this.jwtProperties.getForgotPasswordExpirationMinutes(), ChronoUnit.DAYS);
         User user = userRepository.findByEmail(subject)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 

@@ -8,6 +8,6 @@ import lombok.Data;
 @Schema(description = "Request body for refreshing JWT access token")
 public class RefreshRequest {
     @NotBlank()
-    @Schema(description = "Valid JWT refresh token", example = "eyJhbGciOiJIUzI1NiIsInR5cCI6...")
+    @Schema(description = "Valid JWT refresh token", example = "eyJhbGciOiJIUzI1NiIsInR5cCI6...", required = true)
     private String refreshToken;
 }

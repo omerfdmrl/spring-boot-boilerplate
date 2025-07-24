@@ -17,7 +17,8 @@ public enum ErrorCodes {
 
     USER_UNAUTHORIZED(2000, HttpStatus.UNAUTHORIZED, "Unauthorized"),
 
-    INTERNAL_SERVER_ERROR(4000, HttpStatus.INTERNAL_SERVER_ERROR, "Unexpected server error");
+    INTERNAL_SERVER_ERROR(9000, HttpStatus.INTERNAL_SERVER_ERROR, "Unexpected server error"),
+    VALIDATION_ERROR(9001, HttpStatus.BAD_REQUEST, "Validation Failed");
 
     private final int code;
     private final HttpStatus status;

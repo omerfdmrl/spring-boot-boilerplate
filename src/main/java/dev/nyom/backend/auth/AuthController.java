@@ -49,22 +49,15 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthController {
-    @Autowired
-    private AuthenticationManager authenticationManager;
-    @Autowired
-    private JwtService jwtService;
-    @Autowired
-    private TokenService tokenService;
-    @Autowired
-    private MailService mailService;
-    @Autowired
-    private UserDetailsServiceImpl userDetailsService;
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private TokenRepository tokenRepository;
-    @Autowired
-    private PasswordEncoder encoder;
+    private final AuthenticationManager authenticationManager;
+    private final JwtService jwtService;
+    private final TokenService tokenService;
+    private final MailService mailService;
+    private final UserDetailsServiceImpl userDetailsService;
+    private final UserRepository userRepository;
+    private final TokenRepository tokenRepository;
+    private final PasswordEncoder encoder;
+    private final UserMapper userMapper;
     
     @Operation(
         summary = "User Login",
@@ -107,7 +100,7 @@ public class AuthController {
         User user = userRepository.findByEmail(userDetails.getUsername())
             .orElseThrow(() -> new GlobalException(ErrorCodes.AUTH_USER_NOT_FOUND));
 
-        UserDto userDto = UserMapper.toDto(user);
+        UserDto userDto = this.userMapper.toDto(user);
         TokenDto tokenDto = tokenService.generateJwtTokens(userDetails.getUsername());
         UserTokenResponse userTokenResponse = new UserTokenResponse(tokenDto, userDto);
 
@@ -154,7 +147,7 @@ public class AuthController {
         userRepository.save(newUser);
 
         TokenDto tokenDto = tokenService.generateJwtTokens(newUser.getEmail());
-        UserDto userDto = UserMapper.toDto(newUser);
+        UserDto userDto = this.userMapper.toDto(newUser);
         UserTokenResponse userTokenResponse = new UserTokenResponse(tokenDto, userDto);
 
         return ResponseEntity.ok(userTokenResponse);

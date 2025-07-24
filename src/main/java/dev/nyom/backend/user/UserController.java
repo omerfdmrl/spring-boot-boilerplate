@@ -20,8 +20,8 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api/user")
 @RequiredArgsConstructor
 public class UserController {
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+    private final UserMapper userMapper;
 
     @GetMapping("/me")
     public ResponseEntity<UserDto> me(Authentication authentication) {
@@ -33,7 +33,7 @@ public class UserController {
         User user = userRepository.findByEmail(userDetails.getUsername())
                 .orElseThrow(() -> new GlobalException(ErrorCodes.AUTH_USER_NOT_FOUND));
 
-        UserDto userDto = UserMapper.toDto(user);
+        UserDto userDto = this.userMapper.toDto(user);
         return ResponseEntity.ok(userDto);
     }
 }

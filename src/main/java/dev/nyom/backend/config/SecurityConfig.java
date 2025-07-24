@@ -17,14 +17,12 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import dev.nyom.backend.security.JwtAuthFilter;
 import dev.nyom.backend.security.JwtEntryPoint;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 
-@RequiredArgsConstructor
+@AllArgsConstructor
 @Configuration
 public class SecurityConfig {
-    @Autowired
     private final JwtEntryPoint unauthorizedHandler;
-    @Autowired
     private final JwtAuthFilter jwtAuthFilter;
 
     @Bean
