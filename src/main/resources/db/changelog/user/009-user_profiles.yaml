@@ -1,0 +1,44 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-user_profiles-table
+      author: omer
+      changes:
+        - createTable:
+            tableName: user_profiles
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: user_id
+                  type: BIGSERIAL
+                  constraints:
+                    nullable: false
+              - column:
+                  name: bio
+                  type: TEXT
+              - column:
+                  name: avatar
+                  type: VARCHAR(255)
+              - column:
+                  name: website
+                  type: VARCHAR(255)
+              - column:
+                  name: location
+                  type: VARCHAR(255)
+              - column:
+                  name: social_accounts
+                  type: TEXT
+        - addUniqueConstraint:
+              tableName: user_profiles
+              columnNames: user_id
+              constraintName: uq_user_profiles_user
+        - addForeignKeyConstraint:
+            baseTableName: user_profiles
+            baseColumnNames: user_id
+            referencedTableName: users
+            referencedColumnNames: id
+            constraintName: fk_user_profiles_user
+            onDelete: CASCADE

@@ -1,4 +1,4 @@
-package dev.nyom.backend.auth;
+package dev.nyom.backend.auth.controller;
 
 import java.util.Locale;
 import java.util.Optional;
@@ -65,7 +65,12 @@ public class AuthController {
     
     @Operation(
         summary = "User Login",
-        description = "Authenticate user by email and password and return JWT tokens with user info."
+        description = "Authenticate user by email and password and return JWT tokens with user info.",
+        requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+            description = "Login request containing email and password",
+            required = true,
+            content = @Content(schema = @Schema(implementation = LoginRequest.class))
+        )
     )
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Successful login",
@@ -89,12 +94,7 @@ public class AuthController {
                 schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PostMapping("/login")
-    public ResponseEntity<UserTokenResponse> login(
-        @io.swagger.v3.oas.annotations.parameters.RequestBody(
-            description = "Login request containing email and password",
-            required = true,
-            content = @Content(schema = @Schema(implementation = LoginRequest.class))
-        ) @Valid @RequestBody LoginRequest loginRequest, HttpServletRequest request) {
+    public ResponseEntity<UserTokenResponse> login(@Valid @RequestBody LoginRequest loginRequest, HttpServletRequest request) {
         Authentication authentication = authenticationManager.authenticate(
             new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword())
         );
@@ -116,7 +116,12 @@ public class AuthController {
 
     @Operation(
         summary = "User registration",
-        description = "Registers a new user with name, email, and password. Returns JWT tokens and user info on success."
+        description = "Registers a new user with name, email, and password. Returns JWT tokens and user info on success.",
+        requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+            description = "Register request containing name, email, and password",
+            required = true,
+            content = @Content(schema = @Schema(implementation = RegisterRequest.class))
+        )
     )
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Registration successful",
@@ -136,12 +141,7 @@ public class AuthController {
                 schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PostMapping("/register")
-    public ResponseEntity<UserTokenResponse> register(
-    @io.swagger.v3.oas.annotations.parameters.RequestBody(
-        description = "Register request containing name, email, and password",
-        required = true,
-        content = @Content(schema = @Schema(implementation = RegisterRequest.class))
-    ) @Valid @RequestBody RegisterRequest registerRequest, HttpServletRequest request) {
+    public ResponseEntity<UserTokenResponse> register(@Valid @RequestBody RegisterRequest registerRequest, HttpServletRequest request) {
         if (userRepository.existsByEmail(registerRequest.getEmail())) {
             throw new GlobalException(ErrorCodes.AUTH_EMAIL_TAKEN);
         }
@@ -166,7 +166,12 @@ public class AuthController {
 
     @Operation(
         summary = "Refresh JWT token",
-        description = "Generates a new access token using a valid refresh token"
+        description = "Generates a new access token using a valid refresh token",
+        requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+            description = "Refresh request containing the refresh token",
+            required = true,
+            content = @Content(schema = @Schema(implementation = RefreshRequest.class))
+        )
     )
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "New access token generated",
@@ -190,12 +195,7 @@ public class AuthController {
                 schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PostMapping("/refresh")
-    public ResponseEntity<TokenResponse> refreshToken(
-    @io.swagger.v3.oas.annotations.parameters.RequestBody(
-        description = "Refresh request containing the refresh token",
-        required = true,
-        content = @Content(schema = @Schema(implementation = RefreshRequest.class))
-    ) @Valid @RequestBody RefreshRequest refreshRequest) {
+    public ResponseEntity<TokenResponse> refreshToken(@Valid @RequestBody RefreshRequest refreshRequest) {
         String refreshToken = refreshRequest.getRefreshToken();
         String email;
 
@@ -234,7 +234,12 @@ public class AuthController {
 
     @Operation(
         summary = "Forgot password",
-        description = "Sends a password reset email to the user if the email exists in the system."
+        description = "Sends a password reset email to the user if the email exists in the system.",
+        requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+            description = "Request containing the user's email to initiate password reset",
+            required = true,
+            content = @Content(schema = @Schema(implementation = ForgotPasswordRequest.class))
+        )
     )
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Password reset email sent (or suppressed silently if user not found)",
@@ -249,12 +254,7 @@ public class AuthController {
                 schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PostMapping("/forgot-password")
-    public ResponseEntity<String> forgotPassword(
-    @io.swagger.v3.oas.annotations.parameters.RequestBody(
-        description = "Request containing the user's email to initiate password reset",
-        required = true,
-        content = @Content(schema = @Schema(implementation = ForgotPasswordRequest.class))
-    ) @Valid @RequestBody ForgotPasswordRequest forgotPasswordRequest, Locale locale) {
+    public ResponseEntity<String> forgotPassword(@Valid @RequestBody ForgotPasswordRequest forgotPasswordRequest, Locale locale) {
         Optional<User> userOptional = userRepository.findByEmail(forgotPasswordRequest.getEmail());
 
         userOptional.ifPresent(user -> {
@@ -267,7 +267,12 @@ public class AuthController {
 
     @Operation(
         summary = "Reset password",
-        description = "Resets the user password using a valid reset token and new password."
+        description = "Resets the user password using a valid reset token and new password.",
+        requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+            description = "Request containing reset token and new password",
+            required = true,
+            content = @Content(schema = @Schema(implementation = ResetPasswordRequest.class))
+        )
     )
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Password successfully reset",
@@ -290,12 +295,7 @@ public class AuthController {
                 schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PostMapping("/reset-password")
-    public ResponseEntity<String> resetPassword(
-    @io.swagger.v3.oas.annotations.parameters.RequestBody(
-        description = "Request containing reset token and new password",
-        required = true,
-        content = @Content(schema = @Schema(implementation = ResetPasswordRequest.class))
-    ) @Valid @RequestBody ResetPasswordRequest request) {
+    public ResponseEntity<String> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
         String token = request.getToken();
         Token tokenDoc = tokenRepository.findByToken(token)
             .orElseThrow(() -> new GlobalException(ErrorCodes.AUTH_RESET_TOKEN_INVALID));

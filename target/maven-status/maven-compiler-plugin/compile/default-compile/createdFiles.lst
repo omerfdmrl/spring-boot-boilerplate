@@ -6,7 +6,6 @@ dev/nyom/backend/user/model/Permission.class
 dev/nyom/backend/security/JwtEntryPoint.class
 dev/nyom/backend/user/dto/UserDto.class
 dev/nyom/backend/exceptions/ErrorCodes.class
-dev/nyom/backend/user/services/UserService.class
 dev/nyom/backend/user/repository/RoleRepository.class
 dev/nyom/backend/auth/request/RefreshRequest.class
 dev/nyom/backend/auth/request/LoginRequest.class
@@ -22,7 +21,6 @@ dev/nyom/backend/auth/request/RegisterRequest.class
 dev/nyom/backend/config/SecurityConfig$1.class
 dev/nyom/backend/user/repository/PermissionRepository.class
 dev/nyom/backend/config/LocaleConfig.class
-dev/nyom/backend/user/UserController.class
 dev/nyom/backend/user/repository/UserRepository.class
 dev/nyom/backend/auth/request/ResetPasswordRequest.class
 dev/nyom/backend/user/mapper/UserMapper.class
@@ -32,7 +30,6 @@ dev/nyom/backend/notification/MailDto.class
 dev/nyom/backend/exceptions/ErrorResponse.class
 dev/nyom/backend/user/model/Role.class
 dev/nyom/backend/exceptions/GlobalExceptionHandler.class
-dev/nyom/backend/auth/AuthController.class
 dev/nyom/backend/config/SeederRunner.class
 dev/nyom/backend/security/JwtAuthFilter.class
 dev/nyom/backend/user/impl/CustomUserDetails.class

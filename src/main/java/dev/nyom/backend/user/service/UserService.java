@@ -1,4 +1,4 @@
-package dev.nyom.backend.user.services;
+package dev.nyom.backend.user.service;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
