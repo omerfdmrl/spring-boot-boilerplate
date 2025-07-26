@@ -1,5 +1,6 @@
 package dev.nyom.backend.user.model;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -58,6 +59,21 @@ public class User {
     )
     @Schema(description = "Set of roles assigned to the user")
     private Set<Role> roles = new HashSet<>();
+
+    @Column(name = "is_blocked")
+    private boolean isBlocked = false;
+
+    @Column(name = "is_locked")
+    private boolean isLocked = false;
+
+    @Column(name = "is_enabled")
+    private boolean isEnabled = true;
+
+    @Column(name = "account_expire_at")
+    private Instant accountExpireAt;
+
+    @Column(name = "credentials_expire_at")
+    private Instant credentialsExpireAt;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)

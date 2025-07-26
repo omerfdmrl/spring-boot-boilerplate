@@ -15,6 +15,12 @@ import lombok.*;
 @Table(name = "tokens")
 @Schema(description = "Represents a JWT or reset token with expiration and type.")
 public class Token {
+    public enum TokenType {
+        REFRESH,
+        ACCESS,
+        PASSWORD_RESET
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Schema(description = "Unique identifier of the token", example = "1")
@@ -26,7 +32,7 @@ public class Token {
 
     @Column(nullable = false)
     @Schema(description = "Type of the token (e.g., ACCESS_TOKEN, REFRESH_TOKEN, RESET_PASSWORD)", example = "ACCESS_TOKEN")
-    private String type;
+    private TokenType type;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)

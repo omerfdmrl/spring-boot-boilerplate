@@ -6,12 +6,11 @@ import org.springframework.stereotype.Component;
 
 import dev.nyom.backend.exceptions.ErrorCodes;
 import dev.nyom.backend.exceptions.GlobalException;
-import dev.nyom.backend.user.impl.UserDetailsImpl;
+import dev.nyom.backend.user.impl.CustomUserDetails;
 import dev.nyom.backend.user.model.User;
 
 @Component
-public class CurrentUserService {
-
+public class UserService {
     public User getCurrentUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
@@ -20,7 +19,7 @@ public class CurrentUserService {
         }
 
         Object principal = auth.getPrincipal();
-        if (principal instanceof UserDetailsImpl userDetails) {
+        if (principal instanceof CustomUserDetails userDetails) {
             return userDetails.getUser();
         }
 

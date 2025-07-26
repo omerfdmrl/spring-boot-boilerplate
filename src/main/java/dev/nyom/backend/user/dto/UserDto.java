@@ -7,7 +7,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Data
-@Schema(description = "Request schema for login request.")
+@Schema(description = "User public schema.")
 public class UserDto {
     @NotBlank()
     @Size(min = 4)

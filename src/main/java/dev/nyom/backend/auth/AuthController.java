@@ -1,21 +1,22 @@
 package dev.nyom.backend.auth;
 
 import java.util.Locale;
+import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import dev.nyom.backend.auth.model.Session;
 import dev.nyom.backend.auth.model.Token;
+import dev.nyom.backend.auth.repository.SessionRepository;
 import dev.nyom.backend.auth.repository.TokenRepository;
 import dev.nyom.backend.auth.request.ForgotPasswordRequest;
 import dev.nyom.backend.auth.request.LoginRequest;
@@ -23,8 +24,9 @@ import dev.nyom.backend.auth.request.RefreshRequest;
 import dev.nyom.backend.auth.request.RegisterRequest;
 import dev.nyom.backend.auth.request.ResetPasswordRequest;
 import dev.nyom.backend.auth.dto.TokenDto;
-import dev.nyom.backend.auth.mapper.TokenMapper;
+import dev.nyom.backend.auth.response.TokenResponse;
 import dev.nyom.backend.auth.response.UserTokenResponse;
+import dev.nyom.backend.auth.service.SessionService;
 import dev.nyom.backend.auth.service.TokenService;
 import dev.nyom.backend.exceptions.ErrorCodes;
 import dev.nyom.backend.exceptions.ErrorResponse;
@@ -32,9 +34,9 @@ import dev.nyom.backend.exceptions.GlobalException;
 import dev.nyom.backend.notification.MailService;
 import dev.nyom.backend.security.JwtService;
 import dev.nyom.backend.user.dto.UserDto;
+import dev.nyom.backend.user.impl.CustomUserDetails;
 import dev.nyom.backend.user.mapper.UserMapper;
 import dev.nyom.backend.user.model.User;
-import dev.nyom.backend.user.impl.UserDetailsServiceImpl;
 import dev.nyom.backend.user.repository.UserRepository;
 import dev.nyom.backend.utils.RandomUtils;
 import io.swagger.v3.oas.annotations.Operation;
@@ -42,6 +44,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -53,9 +56,10 @@ public class AuthController {
     private final JwtService jwtService;
     private final TokenService tokenService;
     private final MailService mailService;
-    private final UserDetailsServiceImpl userDetailsService;
+    private final SessionService sessionService;
     private final UserRepository userRepository;
     private final TokenRepository tokenRepository;
+    private final SessionRepository sessionRepository;
     private final PasswordEncoder encoder;
     private final UserMapper userMapper;
     
@@ -90,19 +94,22 @@ public class AuthController {
             description = "Login request containing email and password",
             required = true,
             content = @Content(schema = @Schema(implementation = LoginRequest.class))
-        ) @Valid @RequestBody LoginRequest loginRequest) {
+        ) @Valid @RequestBody LoginRequest loginRequest, HttpServletRequest request) {
         Authentication authentication = authenticationManager.authenticate(
             new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword())
         );
 
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
 
-        User user = userRepository.findByEmail(userDetails.getUsername())
-            .orElseThrow(() -> new GlobalException(ErrorCodes.AUTH_USER_NOT_FOUND));
+        User user = userDetails.getUser();
 
         UserDto userDto = this.userMapper.toDto(user);
-        TokenDto tokenDto = tokenService.generateJwtTokens(userDetails.getUsername());
-        UserTokenResponse userTokenResponse = new UserTokenResponse(tokenDto, userDto);
+        String accessToken = tokenService.generateAccessToken(userDetails.getUsername());
+        Token refreshToken = tokenService.generateRefreshToken(userDetails.getUsername());
+        TokenResponse tokenResponse = new TokenResponse(accessToken, refreshToken.getToken());
+        UserTokenResponse userTokenResponse = new UserTokenResponse(tokenResponse, userDto);
+
+        this.sessionService.createSession(request, user.getId(), refreshToken);
 
         return ResponseEntity.ok(userTokenResponse);
     }
@@ -134,7 +141,7 @@ public class AuthController {
         description = "Register request containing name, email, and password",
         required = true,
         content = @Content(schema = @Schema(implementation = RegisterRequest.class))
-    ) @Valid @RequestBody RegisterRequest registerRequest) {
+    ) @Valid @RequestBody RegisterRequest registerRequest, HttpServletRequest request) {
         if (userRepository.existsByEmail(registerRequest.getEmail())) {
             throw new GlobalException(ErrorCodes.AUTH_EMAIL_TAKEN);
         }
@@ -146,9 +153,13 @@ public class AuthController {
         );
         userRepository.save(newUser);
 
-        TokenDto tokenDto = tokenService.generateJwtTokens(newUser.getEmail());
         UserDto userDto = this.userMapper.toDto(newUser);
-        UserTokenResponse userTokenResponse = new UserTokenResponse(tokenDto, userDto);
+        String accessToken = tokenService.generateAccessToken(newUser.getEmail());
+        Token refreshToken = tokenService.generateRefreshToken(newUser.getEmail());
+        TokenResponse tokenResponse = new TokenResponse(accessToken, refreshToken.getToken());
+        UserTokenResponse userTokenResponse = new UserTokenResponse(tokenResponse, userDto);
+
+        this.sessionService.createSession(request, newUser.getId(), refreshToken);
 
         return ResponseEntity.ok(userTokenResponse);
     }
@@ -179,7 +190,7 @@ public class AuthController {
                 schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PostMapping("/refresh")
-    public ResponseEntity<TokenDto> refreshToken(
+    public ResponseEntity<TokenResponse> refreshToken(
     @io.swagger.v3.oas.annotations.parameters.RequestBody(
         description = "Refresh request containing the refresh token",
         required = true,
@@ -194,16 +205,31 @@ public class AuthController {
             throw new GlobalException(ErrorCodes.AUTH_TOKEN_INVALID);
         }
     
-        UserDetails userDetails = userDetailsService.loadUserByEmail(email);
+        User user = userRepository.findByEmailWithRoles(email)
+                .orElseThrow(() -> new GlobalException(ErrorCodes.AUTH_INVALID_CREDENTIALS));
+
+        CustomUserDetails userDetails = new CustomUserDetails(user);
 
         if (!jwtService.isTokenValid(refreshToken, userDetails, "REFRESH")) {
             throw new GlobalException(ErrorCodes.AUTH_TOKEN_INVALID);
         }
 
-        String newAccessToken = jwtService.generateAccessToken(userDetails.getUsername());
-        TokenDto tokenDto = TokenMapper.toDto(newAccessToken, refreshToken);
+        Session session = this.sessionRepository.findSessionByRefreshToken(refreshToken)
+                    .orElseThrow(() -> new GlobalException(ErrorCodes.AUTH_SESSION_NOT_FOUND));
 
-        return ResponseEntity.ok(tokenDto);
+        if (!session.isActive()) {
+            throw new GlobalException(ErrorCodes.AUTH_SESSION_DISABLED);
+        }
+
+        // session.setLastUsedAt(LocalDateTime.now());
+        // sessionRepository.save(session);
+
+        String accessToken = tokenService.generateAccessToken(userDetails.getUsername());
+        TokenResponse tokenResponse = new TokenResponse(accessToken, refreshToken);
+
+        this.sessionRepository.updateLastUsedAtByRefreshToken(refreshToken);
+
+        return ResponseEntity.ok(tokenResponse);
     }
 
     @Operation(
@@ -229,13 +255,13 @@ public class AuthController {
         required = true,
         content = @Content(schema = @Schema(implementation = ForgotPasswordRequest.class))
     ) @Valid @RequestBody ForgotPasswordRequest forgotPasswordRequest, Locale locale) {
-        try {
-            UserDetails userDetails = userDetailsService.loadUserByEmail(forgotPasswordRequest.getEmail());
-            String token = tokenService.generatePasswordResetToken(userDetails.getUsername());
-            mailService.sendPasswordResetEmail(userDetails.getUsername(), "/" + token, locale);
-        } catch (Exception e) {
-            // Add Logger
-        }
+        Optional<User> userOptional = userRepository.findByEmail(forgotPasswordRequest.getEmail());
+
+        userOptional.ifPresent(user -> {
+            Token token = tokenService.generatePasswordResetToken(user.getEmail());
+            String resetLink = "https://your-app.com/reset-password/" + token.getToken();
+            mailService.sendPasswordResetEmail(user.getEmail(), resetLink, locale);
+        });
         return ResponseEntity.ok("OK");
     }
 

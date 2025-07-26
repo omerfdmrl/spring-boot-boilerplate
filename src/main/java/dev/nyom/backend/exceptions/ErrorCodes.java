@@ -9,6 +9,9 @@ public enum ErrorCodes {
     AUTH_TOKEN_INVALID(1003, HttpStatus.UNAUTHORIZED, "Invalid token"),
     AUTH_EMAIL_TAKEN(1004, HttpStatus.BAD_REQUEST, "Email is already taken"),
     AUTH_RESET_TOKEN_INVALID(1005, HttpStatus.UNAUTHORIZED, "Invalid reset token"),
+    AUTH_SESSION_NOT_FOUND(1006, HttpStatus.NOT_FOUND, "Session not found"),
+    AUTH_INVALID_SESSION(1007, HttpStatus.UNAUTHORIZED, "Invalid session"),
+    AUTH_SESSION_DISABLED(1008, HttpStatus.UNAUTHORIZED, "Session disabled"),
 
     AUTH_DISABLED(1006, HttpStatus.FORBIDDEN, "Account disabled"),
     AUTH_LOCKED(1007, HttpStatus.LOCKED, "Account locked"),

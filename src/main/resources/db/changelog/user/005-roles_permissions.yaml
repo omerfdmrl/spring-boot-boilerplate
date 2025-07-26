@@ -8,12 +8,12 @@ databaseChangeLog:
             columns:
               - column:
                   name: role_id
-                  type: BIGINT
+                  type: BIGSERIAL
                   constraints:
                     nullable: false
               - column:
                   name: permission_id
-                  type: BIGINT
+                  type: BIGSERIAL
                   constraints:
                     nullable: false
         - addPrimaryKey:

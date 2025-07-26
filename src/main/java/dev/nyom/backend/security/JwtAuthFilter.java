@@ -7,21 +7,23 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import dev.nyom.backend.user.impl.UserDetailsServiceImpl;
+import dev.nyom.backend.exceptions.ErrorCodes;
+import dev.nyom.backend.exceptions.GlobalException;
+import dev.nyom.backend.user.impl.CustomUserDetails;
+import dev.nyom.backend.user.model.User;
+import dev.nyom.backend.user.repository.UserRepository;
 
 import java.io.IOException;
 
 @Component
 @RequiredArgsConstructor
 public class JwtAuthFilter extends OncePerRequestFilter {
-
     private final JwtService jwtService;
-    private final UserDetailsServiceImpl userDetailsService;
+    private final UserRepository userRepository;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -45,7 +47,10 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         }
 
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = userDetailsService.loadUserByEmail(email);
+            User user = this.userRepository.findByEmailWithRoles(email)
+                .orElseThrow(() -> new GlobalException(ErrorCodes.AUTH_INVALID_CREDENTIALS));
+
+            CustomUserDetails userDetails = new CustomUserDetails(user);
 
             if (jwtService.isTokenValid(jwt, userDetails, "ACCESS")) {
                 var authToken = new UsernamePasswordAuthenticationToken(

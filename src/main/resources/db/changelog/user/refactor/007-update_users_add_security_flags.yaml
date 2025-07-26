@@ -1,0 +1,26 @@
+databaseChangeLog:
+  - changeSet:
+      id: add-security-fields-to-users
+      author: omer
+      changes:
+        - addColumn:
+            tableName: users
+            columns:
+              - column:
+                  name: is_blocked
+                  type: boolean
+                  defaultValueBoolean: false
+              - column:
+                  name: is_locked
+                  type: boolean
+                  defaultValueBoolean: false
+              - column:
+                  name: is_enabled
+                  type: boolean
+                  defaultValueBoolean: true
+              - column:
+                  name: account_expire_at
+                  type: timestamp
+              - column:
+                  name: credentials_expire_at
+                  type: timestamp

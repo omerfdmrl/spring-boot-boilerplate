@@ -1,14 +1,15 @@
 package dev.nyom.backend.auth.dto;
 
+import dev.nyom.backend.auth.model.Token.TokenType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 @Data
-@Schema(description = "JWT token response after successful refresh")
+@Schema(description = "Token public schema.")
 public class TokenDto {
-    @Schema(description = "Newly issued access token", example = "eyJhbGciOiJIUzI1NiIs...")
-    private String accessToken;
+    @Schema(description = "Token", example = "eyJhbGciOiJIUzI1NiIs...")
+    private String token;
     
-    @Schema(description = "Original refresh token", example = "eyJhbGciOiJIUzI1NiIs...")
-    private String refreshToken;
+    @Schema(description = "Type of the token", example = "REFRESH")
+    private TokenType type;
 }
