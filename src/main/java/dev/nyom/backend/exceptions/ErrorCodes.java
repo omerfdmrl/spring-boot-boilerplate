@@ -19,6 +19,9 @@ public enum ErrorCodes {
     AUTH_CREDENTIALS_EXPIRED(1009, HttpStatus.UNAUTHORIZED, "Account credentials expired"),
 
     USER_UNAUTHORIZED(2000, HttpStatus.UNAUTHORIZED, "Unauthorized"),
+    USER_NOT_FOUND(2001, HttpStatus.NOT_FOUND, "User not found"),
+    USER_PROFILE_NOT_FOUND(2002, HttpStatus.NOT_FOUND, "User profile not found"),
+    USER_CONNOT_FOLLOW_YOURSELF(2003, HttpStatus.BAD_REQUEST, "User cannot follow theirself"),
 
     INTERNAL_SERVER_ERROR(9000, HttpStatus.INTERNAL_SERVER_ERROR, "Unexpected server error"),
     VALIDATION_ERROR(9001, HttpStatus.BAD_REQUEST, "Validation Failed");

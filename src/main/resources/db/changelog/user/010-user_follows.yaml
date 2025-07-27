@@ -1,0 +1,47 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-user_follows-table
+      author: omer
+      changes:
+        - createTable:
+            tableName: user_follows
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: follower_id
+                  type: BIGSERIAL
+                  constraints:
+                    nullable: false
+              - column:
+                  name: following_id
+                  type: BIGSERIAL
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: timestamp
+                  constraints:
+                    nullable: false
+                  defaultValueComputed: CURRENT_TIMESTAMP
+        - addUniqueConstraint:
+            tableName: user_follows
+            columnNames: follower_id,following_id
+            constraintName: uq_user_follows_unique_pair
+        - addForeignKeyConstraint:
+            baseTableName: user_follows
+            baseColumnNames: follower_id
+            referencedTableName: users
+            referencedColumnNames: id
+            constraintName: fk_user_follows_follower
+            onDelete: CASCADE
+        - addForeignKeyConstraint:
+            baseTableName: user_follows
+            baseColumnNames: following_id
+            referencedTableName: users
+            referencedColumnNames: id
+            constraintName: fk_user_follows_following
+            onDelete: CASCADE

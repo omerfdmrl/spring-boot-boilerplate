@@ -16,9 +16,28 @@ import lombok.*;
 @Schema(description = "Represents a JWT or reset token with expiration and type.")
 public class Token {
     public enum TokenType {
-        REFRESH,
-        ACCESS,
-        PASSWORD_RESET
+        REFRESH("REFRESH"),
+        ACCESS("ACCESS"),
+        PASSWORD_RESET("PASSWORD_RESET");
+
+        private String value;
+
+        TokenType(String value) {
+            this.value = value;
+        }
+
+        public String getValue() {
+            return value;
+        }
+
+        public static TokenType fromValue(String value) {
+            for (TokenType type : values()) {
+                if (type.value.equalsIgnoreCase(value)) {
+                    return type;
+                }
+            }
+            throw new IllegalArgumentException("Unknown session type: " + value);
+        }
     }
 
     @Id
@@ -30,6 +49,7 @@ public class Token {
     @Schema(description = "The actual token string", example = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...")
     private String token;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @Schema(description = "Type of the token (e.g., ACCESS_TOKEN, REFRESH_TOKEN, RESET_PASSWORD)", example = "ACCESS_TOKEN")
     private TokenType type;

@@ -18,8 +18,29 @@ import lombok.*;
 @Table(name = "sessions")
 @Schema(description = "Represents a users seessions and devices.")
 public class Session {
-    public enum SessionType {
-        WEB
+    public enum SessionDeviceType {
+        WEB("WEB"),
+        MOBILE("MOBILE"),
+        DESKTOP("DESKTOP");
+
+        private final String value;
+
+        SessionDeviceType(String value) {
+            this.value = value;
+        }
+
+        public String getValue() {
+            return value;
+        }
+
+        public static SessionDeviceType fromValue(String value) {
+            for (SessionDeviceType type : values()) {
+                if (type.value.equalsIgnoreCase(value)) {
+                    return type;
+                }
+            }
+            throw new IllegalArgumentException("Unknown session type: " + value);
+        }
     }
 
     @Id
@@ -27,9 +48,10 @@ public class Session {
     @Schema(description = "Unique identifier of the session", example = "1")
     private Long id;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "device_type")
     @Schema(description = "Device type", example = "web")
-    private SessionType deviceType;
+    private SessionDeviceType deviceType;
 
     @Column(name = "device_name")
     @Schema(description = "Device name", example = "Joo's Iphone")

@@ -25,7 +25,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/session")
+@RequestMapping("/api/sessions")
 @RequiredArgsConstructor
 public class SessionController {
     private final SessionService sessionService;
@@ -109,7 +109,7 @@ public class SessionController {
             )
         )
     })
-    @DeleteMapping("/{id}/delete")
+    @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteSession(@PathVariable Long id, @AuthenticationPrincipal CustomUserDetails userDetails) {
         sessionService.deleteSessionById(id, userDetails.getUser().getId());
         return ResponseEntity.ok("OK");

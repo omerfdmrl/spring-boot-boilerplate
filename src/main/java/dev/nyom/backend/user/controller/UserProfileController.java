@@ -1,9 +1,10 @@
-package dev.nyom.backend.user.dto.controller;
+package dev.nyom.backend.user.controller;
 
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,19 +19,22 @@ import dev.nyom.backend.user.mapper.UserProfileMapper;
 import dev.nyom.backend.user.model.User;
 import dev.nyom.backend.user.model.UserProfile;
 import dev.nyom.backend.user.service.UserProfileService;
+import dev.nyom.backend.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/user/profile")
+@RequestMapping("/api/users")
 @RequiredArgsConstructor
 public class UserProfileController {
     private final UserProfileService userProfileService;
     private final UserProfileMapper userProfileMapper;
+    private final UserService userService;
 
     @Operation(
         summary = "Get current user's profile",
@@ -67,7 +71,7 @@ public class UserProfileController {
             )
         }
     )
-    @GetMapping
+    @GetMapping("/me")
     public ResponseEntity<UserProfileDto> getProfile(@AuthenticationPrincipal CustomUserDetails userDetails) {
         User user = userDetails.getUser();
         UserProfile userProfile = this.userProfileService.findByUser(user)
@@ -123,7 +127,7 @@ public class UserProfileController {
             )
         }
     )
-    @PutMapping
+    @PutMapping("/me")
     public ResponseEntity<String> updateProfile(@AuthenticationPrincipal CustomUserDetails userDetails, @Valid @RequestBody UserProfileDto profileDto) {
         User user = userDetails.getUser();
         UserProfile profile = this.userProfileService.findByUser(user)
@@ -141,5 +145,47 @@ public class UserProfileController {
 
         this.userProfileService.save(profile);
         return ResponseEntity.ok("OK");
+    }
+
+    @Operation(
+        summary = "Get profile by username",
+        description = "Returns the public profile of the user with the given username"
+    )
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "User profile fetched successfully",
+            content = @Content(
+                mediaType = MediaType.APPLICATION_JSON_VALUE,
+                schema = @Schema(implementation = UserProfileDto.class)
+            )
+        ),
+        @ApiResponse(
+            responseCode = "404",
+            description = "User or profile not found",
+            content = @Content(
+                mediaType = MediaType.APPLICATION_JSON_VALUE,
+                schema = @Schema(implementation = ErrorResponse.class)
+            )
+        ),
+        @ApiResponse(
+            responseCode = "500",
+            description = "Internal server error",
+            content = @Content(
+                mediaType = MediaType.APPLICATION_JSON_VALUE,
+                schema = @Schema(implementation = ErrorResponse.class)
+            )
+        )
+    })
+    @GetMapping("/{username}")
+    public ResponseEntity<UserProfileDto> getUserProfile(@PathVariable String username , @AuthenticationPrincipal CustomUserDetails userDetails) {
+        User user = this.userService.findByUsername(username)
+                .orElseThrow(() -> new GlobalException(ErrorCodes.USER_NOT_FOUND));
+
+        UserProfile userProfile = userProfileService.findByUser(user)
+                .orElseThrow(() -> new GlobalException(ErrorCodes.USER_PROFILE_NOT_FOUND));
+
+        UserProfileDto userProfileDto = this.userProfileMapper.toDto(userProfile);
+        return ResponseEntity.ok(userProfileDto);
     }
 }

@@ -11,7 +11,7 @@ import dev.nyom.backend.auth.dto.SessionDto;
 import dev.nyom.backend.auth.mapper.SessionMapper;
 import dev.nyom.backend.auth.model.Session;
 import dev.nyom.backend.auth.model.Token;
-import dev.nyom.backend.auth.model.Session.SessionType;
+import dev.nyom.backend.auth.model.Session.SessionDeviceType;
 import dev.nyom.backend.auth.repository.SessionRepository;
 import dev.nyom.backend.exceptions.ErrorCodes;
 import dev.nyom.backend.exceptions.GlobalException;
@@ -36,7 +36,7 @@ public class SessionService {
 
         Session session = existingSessionOpt.orElseGet(Session::new);
         session.setToken(refreshToken);
-        session.setDeviceType(SessionType.WEB);
+        session.setDeviceType(SessionDeviceType.WEB);
         session.setIpAddress(ip);
         session.setUserAgent(userAgent);
         session.setActive(true);
