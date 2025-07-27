@@ -31,6 +31,12 @@
 /home/obuntu/Projects/nyom.dev/backend2/src/main/java/dev/nyom/backend/security/JwtEntryPoint.java
 /home/obuntu/Projects/nyom.dev/backend2/src/main/java/dev/nyom/backend/security/JwtProperties.java
 /home/obuntu/Projects/nyom.dev/backend2/src/main/java/dev/nyom/backend/security/JwtService.java
+/home/obuntu/Projects/nyom.dev/backend2/src/main/java/dev/nyom/backend/system/controller/SettingController.java
+/home/obuntu/Projects/nyom.dev/backend2/src/main/java/dev/nyom/backend/system/dto/SettingDto.java
+/home/obuntu/Projects/nyom.dev/backend2/src/main/java/dev/nyom/backend/system/mapper/SettingMapper.java
+/home/obuntu/Projects/nyom.dev/backend2/src/main/java/dev/nyom/backend/system/model/Setting.java
+/home/obuntu/Projects/nyom.dev/backend2/src/main/java/dev/nyom/backend/system/repository/SettingRepository.java
+/home/obuntu/Projects/nyom.dev/backend2/src/main/java/dev/nyom/backend/system/service/SettingService.java
 /home/obuntu/Projects/nyom.dev/backend2/src/main/java/dev/nyom/backend/user/controller/UserController.java
 /home/obuntu/Projects/nyom.dev/backend2/src/main/java/dev/nyom/backend/user/controller/UserFollowController.java
 /home/obuntu/Projects/nyom.dev/backend2/src/main/java/dev/nyom/backend/user/controller/UserProfileController.java

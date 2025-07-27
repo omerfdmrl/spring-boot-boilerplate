@@ -1,0 +1,40 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-settings-table
+      author: omer
+      changes:
+        - createTable:
+            tableName: settings
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: key
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: value
+                  type: TEXT
+              - column:
+                  name: type
+                  type: VARCHAR(20)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: BIGSERIAL
+        - addForeignKeyConstraint:
+            baseTableName: settings
+            baseColumnNames: user_id
+            referencedTableName: users
+            referencedColumnNames: id
+            constraintName: fk_settings_user
+            onDelete: CASCADE
+        - addUniqueConstraint:
+            tableName: settings
+            columnNames: key, user_id
+            constraintName: uq_settings_key_user

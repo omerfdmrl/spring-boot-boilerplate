@@ -20,7 +20,7 @@ public class Token {
         ACCESS("ACCESS"),
         PASSWORD_RESET("PASSWORD_RESET");
 
-        private String value;
+        private final String value;
 
         TokenType(String value) {
             this.value = value;

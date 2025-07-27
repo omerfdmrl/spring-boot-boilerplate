@@ -12,6 +12,7 @@ public enum ErrorCodes {
     AUTH_SESSION_NOT_FOUND(1006, HttpStatus.NOT_FOUND, "Session not found"),
     AUTH_INVALID_SESSION(1007, HttpStatus.UNAUTHORIZED, "Invalid session"),
     AUTH_SESSION_DISABLED(1008, HttpStatus.UNAUTHORIZED, "Session disabled"),
+    AUTH_FORBIDDEN(1009, HttpStatus.FORBIDDEN, "Auth forbidden"),
 
     AUTH_DISABLED(1006, HttpStatus.FORBIDDEN, "Account disabled"),
     AUTH_LOCKED(1007, HttpStatus.LOCKED, "Account locked"),
@@ -22,6 +23,8 @@ public enum ErrorCodes {
     USER_NOT_FOUND(2001, HttpStatus.NOT_FOUND, "User not found"),
     USER_PROFILE_NOT_FOUND(2002, HttpStatus.NOT_FOUND, "User profile not found"),
     USER_CONNOT_FOLLOW_YOURSELF(2003, HttpStatus.BAD_REQUEST, "User cannot follow theirself"),
+
+    SETTING_NOT_FOUND(8000, HttpStatus.NOT_FOUND, "Setting not found"),
 
     INTERNAL_SERVER_ERROR(9000, HttpStatus.INTERNAL_SERVER_ERROR, "Unexpected server error"),
     VALIDATION_ERROR(9001, HttpStatus.BAD_REQUEST, "Validation Failed");
