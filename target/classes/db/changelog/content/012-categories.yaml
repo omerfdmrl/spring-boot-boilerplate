@@ -1,0 +1,64 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-categories-table
+      author: omer
+      changes:
+        - createTable:
+            tableName: categories
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: title
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: slug
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: description
+                  type: TEXT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: icon
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: color
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: is_active
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+              - column:
+                  name: created_at
+                  type: timestamp
+                  constraints:
+                    nullable: false
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column:
+                  name: updated_at
+                  type: timestamp
+                  constraints:
+                    nullable: false
+                  defaultValueComputed: CURRENT_TIMESTAMP
+        - addUniqueConstraint:
+              tableName: categories
+              columnNames: slug
+              constraintName: uq_categories_slug
+        - createIndex:
+            indexName: idx_category_slug
+            tableName: categories
+            columns:
+              - column: { name: slug }

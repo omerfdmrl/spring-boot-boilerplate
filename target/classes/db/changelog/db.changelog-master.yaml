@@ -5,3 +5,9 @@ databaseChangeLog:
   - includeAll:
       path: auth/
       relativeToChangelogFile: true
+  - includeAll:
+      path: content/
+      relativeToChangelogFile: true
+  - includeAll:
+      path: article/
+      relativeToChangelogFile: true

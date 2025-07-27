@@ -33,6 +33,11 @@ databaseChangeLog:
                   type: TIMESTAMP
                   constraints:
                     nullable: false
+        - createIndex:
+            indexName: idx_tokens_token
+            tableName: tokens
+            columns:
+              - column: { name: token }
         - addForeignKeyConstraint:
             baseTableName: tokens
             baseColumnNames: user_id

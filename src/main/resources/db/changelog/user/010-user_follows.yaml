@@ -31,6 +31,12 @@ databaseChangeLog:
             tableName: user_follows
             columnNames: follower_id,following_id
             constraintName: uq_user_follows_unique_pair
+        - createIndex:
+            indexName: idx_user_follows_pair
+            tableName: user_follows
+            columns:
+              - column: { name: follower_id }
+              - column: { name: following_id }
         - addForeignKeyConstraint:
             baseTableName: user_follows
             baseColumnNames: follower_id

@@ -1,0 +1,40 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-articles_tags-table
+      author: omer
+      changes:
+        - createTable:
+            tableName: articles_tags
+            columns:
+              - column:
+                  name: article_id
+                  type: BIGSERIAL
+                  constraints:
+                    nullable: false
+              - column:
+                  name: tag_id
+                  type: BIGSERIAL
+                  constraints:
+                    nullable: false
+        - addPrimaryKey:
+            tableName: articles_tags
+            columnNames: article_id, tag_id
+            constraintName: pk_articles_tags
+        - createIndex:
+            indexName: idx_articles_tags_pair
+            tableName: articles_tags
+            columns:
+              - column: { name: article_id }
+              - column: { name: tag_id }
+        - addForeignKeyConstraint:
+            baseTableName: articles_tags
+            baseColumnNames: article_id
+            referencedTableName: articles
+            referencedColumnNames: id
+            constraintName: fk_articles_tags_article
+        - addForeignKeyConstraint:
+            baseTableName: articles_tags
+            baseColumnNames: tag_id
+            referencedTableName: tags
+            referencedColumnNames: id
+            constraintName: fk_articles_tags_tag

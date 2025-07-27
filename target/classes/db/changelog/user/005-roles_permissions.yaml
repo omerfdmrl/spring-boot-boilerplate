@@ -20,6 +20,12 @@ databaseChangeLog:
             tableName: roles_permissions
             columnNames: role_id, permission_id
             constraintName: pk_roles_permissions
+        - createIndex:
+            indexName: idx_roles_permissions_pair
+            tableName: roles_permissions
+            columns:
+              - column: { name: role_id }
+              - column: { name: permission_id }
         - addForeignKeyConstraint:
             baseTableName: roles_permissions
             baseColumnNames: role_id

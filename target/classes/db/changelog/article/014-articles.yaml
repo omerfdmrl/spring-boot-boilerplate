@@ -1,0 +1,120 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-articles-table
+      author: omer
+      changes:
+        - createTable:
+            tableName: articles
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: title
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: slug
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: excerpt
+                  type: TEXT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: content
+                  type: TEXT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: image
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: author_id
+                  type: BIGSERIAL
+                  constraints:
+                    nullable: false
+              - column:
+                  name: category_id
+                  type: BIGSERIAL
+                  constraints:
+                    nullable: false
+              - column:
+                  name: status
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: is_featured
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+              - column:
+                  name: is_pinned
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+              - column:
+                  name: read_time
+                  type: INTEGER
+              - column:
+                  name: published_at
+                  type: timestamp
+              - column:
+                  name: created_at
+                  type: timestamp
+                  constraints:
+                    nullable: false
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column:
+                  name: updated_at
+                  type: timestamp
+                  constraints:
+                    nullable: false
+                  defaultValueComputed: CURRENT_TIMESTAMP
+        - addForeignKeyConstraint:
+            baseTableName: articles
+            baseColumnNames: author_id
+            referencedTableName: users
+            referencedColumnNames: id
+            constraintName: fk_articles_user
+            onDelete: CASCADE
+        - addForeignKeyConstraint:
+            baseTableName: articles
+            baseColumnNames: category_id
+            referencedTableName: categories
+            referencedColumnNames: id
+            constraintName: fk_articles_category
+            onDelete: CASCADE
+        - createIndex:
+            indexName: idx_articles_slug
+            tableName: articles
+            columns:
+              - column: { name: slug }
+        - createIndex:
+            indexName: idx_articles_author
+            tableName: articles
+            columns:
+              - column: { name: author_id }
+        - createIndex:
+            indexName: idx_articles_category
+            tableName: articles
+            columns:
+              - column: { name: category_id }
+        - createIndex:
+            indexName: idx_articles_published
+            tableName: articles
+            columns:
+              - column: { name: status }
+              - column: { name: published_at }
+        - createIndex:
+            indexName: idx_articles_featured
+            tableName: articles
+            columns:
+              - column: { name: is_featured }
+              - column: { name: published_at }

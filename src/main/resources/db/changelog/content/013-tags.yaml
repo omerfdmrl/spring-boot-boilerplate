@@ -1,0 +1,64 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-tags-table
+      author: omer
+      changes:
+        - createTable:
+            tableName: tags
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: title
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: slug
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: description
+                  type: TEXT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: icon
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: color
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: is_active
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+              - column:
+                  name: created_at
+                  type: timestamp
+                  constraints:
+                    nullable: false
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column:
+                  name: updated_at
+                  type: timestamp
+                  constraints:
+                    nullable: false
+                  defaultValueComputed: CURRENT_TIMESTAMP
+        - addUniqueConstraint:
+              tableName: tags
+              columnNames: slug
+              constraintName: uq_tags_slug
+        - createIndex:
+            indexName: idx_tag_slug
+            tableName: tags
+            columns:
+              - column: { name: slug }

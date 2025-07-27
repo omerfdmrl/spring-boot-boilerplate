@@ -31,6 +31,11 @@ databaseChangeLog:
               - column:
                   name: social_accounts
                   type: TEXT
+        - createIndex:
+            indexName: idx_user_profiles_user
+            tableName: user_profiles
+            columns:
+              - column: { name: user_id }
         - addUniqueConstraint:
               tableName: user_profiles
               columnNames: user_id

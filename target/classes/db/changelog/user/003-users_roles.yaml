@@ -19,7 +19,13 @@ databaseChangeLog:
         - addPrimaryKey:
             tableName: users_roles
             columnNames: user_id, role_id
-            constraintName: pk_users_roles
+            constraintName: pk_users_roles_unique_pair
+        - createIndex:
+            indexName: idx_users_roles_pair
+            tableName: users_roles
+            columns:
+              - column: { name: user_id }
+              - column: { name: role_id }
         - addForeignKeyConstraint:
             baseTableName: users_roles
             baseColumnNames: user_id

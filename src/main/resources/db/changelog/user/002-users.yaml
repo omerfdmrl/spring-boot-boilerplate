@@ -52,3 +52,13 @@ databaseChangeLog:
               tableName: users
               columnNames: email
               constraintName: uq_users_email
+        - createIndex:
+            indexName: idx_user_username
+            tableName: users
+            columns:
+              - column: { name: username }
+        - createIndex:
+            indexName: idx_user_email
+            tableName: users
+            columns:
+              - column: { name: email }
